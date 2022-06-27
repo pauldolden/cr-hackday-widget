@@ -65,6 +65,9 @@ const IndexPage = () => {
   });
 
   const onSubmit = async (formData: FieldValues) => {
+    setIsFailure(false);
+    setIsSuccess(false);
+    setResponseMessage("")
     const isValid = await validationSchema.isValid(formData);
 
     if (isValid) {
