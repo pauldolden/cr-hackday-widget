@@ -1,18 +1,19 @@
 import * as React from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import {
-  Button,
-  Container,
-  ErrorMessage,
-  Field,
-  logoSrc,
-  Logo,
-  ResponseBanner,
-} from "../styles/widgetStyles";
+import { Container } from "../styles/widgetStyles";
 import { object, string, mixed } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import axios, { AxiosError } from "axios";
+import {
+  Input,
+  Select,
+  ThemeProvider,
+  crTheme,
+  ButtonWithStates,
+  Banner,
+  Logo,
+} from "@comicrelief/component-library";
 
 enum Causes {
   CLIMATE_CHANGE = "Climate Change",
@@ -20,6 +21,7 @@ enum Causes {
   LGBTQA = "LGBTQA+ Equality",
   MISC = "Misc",
 }
+const causes = Object.values(Causes);
 
 interface FormField {
   name: string;
@@ -53,6 +55,7 @@ const validationSchema = object().shape({
 });
 
 const WidgetPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFailure, setIsFailure] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
@@ -68,6 +71,7 @@ const WidgetPage = () => {
   });
 
   const onSubmit = async (formData: FieldValues) => {
+    setIsLoading(true);
     setIsFailure(false);
     setIsSuccess(false);
     setResponseMessage("");
@@ -77,6 +81,7 @@ const WidgetPage = () => {
       try {
         const res = await axios.post(process.env.GATSBY_API_URL!, formData);
         setResponseMessage(res.data.message);
+        setIsLoading(false);
 
         if (res.status === 201) {
           return setIsSuccess(true);
@@ -86,9 +91,12 @@ const WidgetPage = () => {
         const error = err as AxiosError;
         setIsFailure(true);
         setResponseMessage(error.message);
+        setIsLoading(false);
       }
     } else {
       setIsFailure(true);
+      setIsLoading(false);
+
       setResponseMessage(
         "There seems to be a problem submitting form, please check all the information is correct."
       );
@@ -117,41 +125,54 @@ const WidgetPage = () => {
   ];
 
   return (
-    <Container>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Logo src={logoSrc} />
-        {fields.map((field) => (
-          <Field key={field.name}>
-            <label htmlFor={field.name}>{field.label}</label>
-            <input
-              id={field.name}
-              type={field.name}
-              defaultValue={field.defaultValue}
-              {...register(field.name, { required: true })}
-            />
-            {errors[field.name] && (
-              <ErrorMessage>
-                {errors[field.name]?.message as ReactNode}
-              </ErrorMessage>
-            )}
-          </Field>
-        ))}
-        <Field>
-          <label>What do you want to fix?</label>
-          <select {...register("solve", { required: true })}>
-            {Object.values(Causes).map((cause) => (
-              <option key={cause}>{cause}</option>
-            ))}
-          </select>
-        </Field>
-        <Button>Save The World!</Button>
-        <ResponseBanner success={isSuccess} show={isSuccess || isFailure}>
-          <span>{responseMessage} &nbsp;</span>
-          <span>{isSuccess && "🎉"}</span>
-          <span>{isFailure && "😞"}</span>
-        </ResponseBanner>
-      </form>
-    </Container>
+    <ThemeProvider theme={crTheme}>
+      <Container>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="logo-wrapper">
+            <Logo sizeMd="10rem" />
+          </div>
+          {fields.map((field) => (
+            <>
+              <Input
+                id={field.name}
+                type={field.type}
+                placeholder={field.defaultValue}
+                label={field.label}
+                errorMsg={errors[field.name]?.message}
+                {...register(field.name, { required: true })}
+              />
+            </>
+          ))}
+
+          <Select
+            {...register("solve", { required: true })}
+            defaultValue={causes[0]}
+            label="What do you want to fix?"
+            options={causes.map((cause) => ({
+              value: cause,
+              displayValue: cause,
+            }))}
+          />
+
+          <ButtonWithStates
+            disabled={isLoading}
+            loading={isLoading}
+            loadingText={"Saving the world..."}
+          >
+            Save The World!
+          </ButtonWithStates>
+          {(isSuccess || isFailure) && (
+            <Banner backgroundColor={isSuccess ? "green" : "red"}>
+              <span className="response-message">
+                {responseMessage} &nbsp;
+                {isSuccess && "🎉"}
+                {isFailure && "😞"}
+              </span>
+            </Banner>
+          )}
+        </form>
+      </Container>
+    </ThemeProvider>
   );
 };
 

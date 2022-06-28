@@ -10,7 +10,7 @@ export const Container = styled.main`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
 
   form {
     display: flex;
@@ -20,80 +20,19 @@ export const Container = styled.main`
     align-items: stretch;
     flex-direction: column;
     padding: 2rem;
+    margin: 2rem;
     width: 50%;
     border-radius: 5px;
+
+    .logo-wrapper {
+      align-self: center;
+    }
+
+    .response-message {
+      font-family: sans-serif;
+      font-size: 2rem;
+      color: #fff;
+      font-weight: 700;
+    }
   }
-`;
-
-export const Field = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  padding: 0.3rem;
-  border: 1px solid #000000;
-  border-radius: 5px;
-  gap: 0.4rem;
-
-  &:focus-within {
-    border-color: ${red};
-  }
-
-  label {
-    font-size: 0.8rem;
-    font-family: sans-serif;
-    margin-left: 0.1rem;
-    color: ${red};
-    font-weight: 700;
-  }
-
-  select,
-  input {
-    outline: none;
-    border: none;
-    background-color: #ffffff;
-  }
-`;
-
-export const Button = styled.button`
-  background-color: ${red};
-  border: none;
-  padding: 0.4rem;
-  border-radius: 5px;
-  color: #ffffff;
-  font-weight: 700;
-  min-height: 2.5rem;
-  cursor: pointer;
-
-  &:focus {
-    background-color: ${redDark};
-  }
-`;
-
-export const ErrorMessage = styled.span`
-  font-size: 0.6rem;
-  color: ${red};
-  font-weight: 700;
-  font-family: sans-serif;
-`;
-interface ResponseBannerProps {
-  success: boolean;
-  show: boolean;
-}
-
-export const ResponseBanner = styled.div`
-  background-color: ${(props: ResponseBannerProps) =>
-    props.success ? "green" : "red"};
-  display: ${(props: ResponseBannerProps) => (props.show ? "flex" : "none")};
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  color: #ffffff;
-  font-family: sans-serif;
-  font-weight: 700;
-`;
-
-export const Logo = styled.img`
-  height: 10rem;
-  width: 10rem;
-  align-self: center;
 `;
