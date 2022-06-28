@@ -5,7 +5,7 @@ import {
   Container,
   ErrorMessage,
   Field,
-  logo,
+  logoSrc,
   Logo,
   ResponseBanner,
 } from "../styles/formStyles";
@@ -17,6 +17,7 @@ import axios, { AxiosError } from "axios";
 enum Causes {
   CLIMATE_CHANGE = "Climate Change",
   UKRAINE_WARE = "War In Ukraine",
+  LGBTQA = "LGBTQA+ Equality",
   MISC = "Misc",
 }
 
@@ -30,19 +31,21 @@ interface FormField {
 const validationSchema = object().shape({
   firstName: string()
     .required("First Name is a required field.")
+    .min(2, "Please enter your full first name.")
     .matches(
       /^[\p{L}'][ \p{L}'-]*[\p{L}]$/u,
       "This field must only contain letters."
     ),
   secondName: string()
     .required("Second Name is a required field.")
+    .min(2, "Please enter your full second name.")
     .matches(
       /^[\p{L}'][ \p{L}'-]*[\p{L}]$/u,
       "This field must only contain letters."
     ),
   email: string()
-    .email("Email must be valid.")
     .required("Email is a required field.")
+    .email("Email must be valid.")
     .max(64, "Email can be no longer than 64 characters"),
   solve: mixed<Causes>()
     .oneOf(Object.values(Causes))
@@ -67,15 +70,12 @@ const IndexPage = () => {
   const onSubmit = async (formData: FieldValues) => {
     setIsFailure(false);
     setIsSuccess(false);
-    setResponseMessage("")
+    setResponseMessage("");
     const isValid = await validationSchema.isValid(formData);
 
     if (isValid) {
       try {
-        const res = await axios.post(
-          process.env.GATSBY_API_URL!,
-          formData
-        );
+        const res = await axios.post(process.env.GATSBY_API_URL!, formData);
         setResponseMessage(res.data.message);
 
         if (res.status === 201) {
@@ -89,7 +89,9 @@ const IndexPage = () => {
       }
     } else {
       setIsFailure(true);
-      setResponseMessage("There seems to be a problem submitting form, please check all the information is correct.")
+      setResponseMessage(
+        "There seems to be a problem submitting form, please check all the information is correct."
+      );
     }
   };
 
@@ -98,26 +100,26 @@ const IndexPage = () => {
       name: "firstName",
       label: "First Name",
       type: "text",
-      defaultValue: "Paul",
+      defaultValue: "John",
     },
     {
       name: "secondName",
       label: "Second Name",
       type: "text",
-      defaultValue: "Dolden",
+      defaultValue: "Smith",
     },
     {
       name: "email",
       label: "Email Address",
       type: "email",
-      defaultValue: "P.Dolden@ComicRelief.com",
+      defaultValue: "J.Smith@example.com",
     },
   ];
 
   return (
     <Container>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Logo src={logo} />
+        <Logo src={logoSrc} />
         {fields.map((field) => (
           <Field key={field.name}>
             <label htmlFor={field.name}>{field.label}</label>
@@ -136,8 +138,10 @@ const IndexPage = () => {
         ))}
         <Field>
           <label>What do you want to fix?</label>
-          <select {...register("solve", {required: true})}>
-            {Object.values(Causes).map(cause => (<option key={cause}>{cause}</option>))}
+          <select {...register("solve", { required: true })}>
+            {Object.values(Causes).map((cause) => (
+              <option key={cause}>{cause}</option>
+            ))}
           </select>
         </Field>
         <Button>Save The World!</Button>
