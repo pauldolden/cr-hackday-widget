@@ -4,4 +4,10 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
     padding: 2rem;
+
+    nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
 `

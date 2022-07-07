@@ -1,6 +1,6 @@
 import * as React from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { Container } from "../styles/widgetStyles";
+import { FieldValues, FormProvider, useForm } from "react-hook-form";
+import { Container } from "../styles/widget.styles";
 import { object, string, mixed } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
@@ -13,7 +13,10 @@ import {
   ButtonWithStates,
   Banner,
   Logo,
+  /* @ts-ignore */
 } from "@comicrelief/component-library";
+import { FormField } from "../types/FormField";
+import { HTMLInputTypes } from "../enums/HTMLInputTypes";
 
 enum Causes {
   CLIMATE_CHANGE = "Climate Change",
@@ -22,13 +25,6 @@ enum Causes {
   MISC = "Misc",
 }
 const causes = Object.values(Causes);
-
-interface FormField {
-  name: string;
-  label: string;
-  type: React.HTMLInputTypeAttribute;
-  defaultValue?: string;
-}
 
 const validationSchema = object().shape({
   firstName: string()
@@ -107,19 +103,19 @@ const WidgetPage = () => {
     {
       name: "firstName",
       label: "First Name",
-      type: "text",
+      type: HTMLInputTypes.TEXT,
       defaultValue: "John",
     },
     {
       name: "secondName",
       label: "Second Name",
-      type: "text",
+      type: HTMLInputTypes.TEXT,
       defaultValue: "Smith",
     },
     {
       name: "email",
       label: "Email Address",
-      type: "email",
+      type: HTMLInputTypes.EMAIL,
       defaultValue: "J.Smith@example.com",
     },
   ];
@@ -132,16 +128,14 @@ const WidgetPage = () => {
             <Logo sizeMd="10rem" />
           </div>
           {fields.map((field) => (
-            <>
-              <Input
-                id={field.name}
-                type={field.type}
-                placeholder={field.defaultValue}
-                label={field.label}
-                errorMsg={errors[field.name]?.message}
-                {...register(field.name, { required: true })}
-              />
-            </>
+            <Input
+              id={field.name}
+              type={field.type}
+              placeholder={field.defaultValue}
+              label={field.label}
+              errorMsg={errors[field.name]?.message}
+              {...register(field.name, { required: true })}
+            />
           ))}
 
           <Select

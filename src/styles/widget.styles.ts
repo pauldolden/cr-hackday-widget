@@ -22,7 +22,18 @@ export const Container = styled.main`
     padding: 2rem;
     margin: 2rem;
     width: 50%;
+    max-width: 50rem;
     border-radius: 5px;
+
+    label {
+      div {
+        display: flex;
+
+        input {
+          max-width: unset;
+        }
+      }
+    }
 
     .logo-wrapper {
       align-self: center;
